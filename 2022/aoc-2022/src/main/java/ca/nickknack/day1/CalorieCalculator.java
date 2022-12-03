@@ -1,4 +1,4 @@
-package ca.nickknack;
+package ca.nickknack.day1;
 
 import java.util.Comparator;
 import java.util.List;

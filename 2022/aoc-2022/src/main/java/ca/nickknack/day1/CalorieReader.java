@@ -1,4 +1,6 @@
-package ca.nickknack;
+package ca.nickknack.day1;
+
+import ca.nickknack.util.ScannerUtil;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -9,7 +11,7 @@ public class CalorieReader {
     public List<Elf> readElfCaloriesFromFile(String filename) {
         List<Elf> elves = new ArrayList<>();
 
-        Scanner scanner = getScanner(filename);
+        Scanner scanner = ScannerUtil.newScanner(filename);
 
         while (scanner.hasNext()) {
             Elf elf = new Elf();
@@ -28,10 +30,5 @@ public class CalorieReader {
             }
             elf.addCalorieEntry(Integer.valueOf(line));
         }
-    }
-
-    private Scanner getScanner(String filename) {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename);
-        return new Scanner(inputStream);
     }
 }
