@@ -24,7 +24,9 @@ hs_err_pid*
 
 *.iml
 
-/.idea
+**/.idea
+**/target
+**/.DS_Store
 
 2022/aoc-2022-1/.idea/
 
@@ -33,3 +35,10 @@ hs_err_pid*
 2022/aoc-2022/.idea/
 
 2022/aoc-2022/target/classes/
+
+
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
