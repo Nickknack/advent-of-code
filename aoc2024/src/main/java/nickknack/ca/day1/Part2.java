@@ -7,7 +7,7 @@ public class Part2 {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         List<Integer> list1 = new ArrayList<>();
         Map<Integer, Integer> secondListCount = new HashMap<>();
-        try (Scanner scanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("day1/input1.txt"))) {
+        try (Scanner scanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("test/day1/input1.txt"))) {
             while (scanner.hasNext()) {
                 list1.add(scanner.nextInt());
                 int list2Number = scanner.nextInt();

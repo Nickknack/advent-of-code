@@ -12,7 +12,7 @@ public class Part1 {
         List<Integer> list1 = new ArrayList<>();
         List<Integer> list2 = new ArrayList<>();
 
-        try (Scanner scanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("day1/input1.txt"))) {
+        try (Scanner scanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("test/day1/input1.txt"))) {
             while (scanner.hasNext()) {
                 list1.add(scanner.nextInt());
                 list2.add(scanner.nextInt());
