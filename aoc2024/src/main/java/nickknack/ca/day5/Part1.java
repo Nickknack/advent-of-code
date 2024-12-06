@@ -37,7 +37,7 @@ public class Part1 {
 		}
 	}
 
-	private static Optional<Integer> getMiddlePage(String[] updatePages, Map < Integer, List < Integer >> rules){
+	private static Optional<Integer> getMiddlePage(String[] updatePages, Map <Integer, List <Integer>> rules){
 		Map<Integer, Integer> pageHits = new HashMap<>();
 		for (String updatePage : updatePages) {
 			int page = Integer.parseInt(updatePage);
