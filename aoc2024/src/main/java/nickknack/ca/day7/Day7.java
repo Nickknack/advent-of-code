@@ -16,28 +16,22 @@ public class Day7 {
 
     public static void part1(Map<Long, List<Long>> input) {
         System.out.println("Part 1 start");
-        List<Operator> validOperators = List.of(Operator.ADD, Operator.MULTIPLY);
-
-        Long result = input.entrySet().stream()
-                .filter(entry -> isValidEquation(entry.getKey(), entry.getValue(), validOperators))
-                .map(Map.Entry::getKey)
-                .reduce(0L, Long::sum);
-
+        Long result = doExercise(input, List.of(Operator.ADD, Operator.MULTIPLY));
         System.out.printf("result of Part 1 is: %s\n", result);
     }
 
     public static void part2(Map<Long, List<Long>> input) {
         System.out.println("Part 2 start");
-        List<Operator> validOperators = List.of(Operator.ADD, Operator.MULTIPLY, Operator.CONCATENATE);
-
-        Long result = input.entrySet().stream()
-                .filter(entry -> isValidEquation(entry.getKey(), entry.getValue(), validOperators))
-                .map(Map.Entry::getKey)
-                .reduce(0L, Long::sum);
-
+        Long result = doExercise(input, List.of(Operator.ADD, Operator.MULTIPLY, Operator.CONCATENATE));
         System.out.printf("result of Part 2 is: %s\n", result);
     }
 
+    public static long doExercise(Map<Long, List<Long>> input, List<Operator> validOperators) {
+        return input.entrySet().stream()
+                .filter(entry -> isValidEquation(entry.getKey(), entry.getValue(), validOperators))
+                .map(Map.Entry::getKey)
+                .reduce(0L, Long::sum);
+    }
 
     private static Map<Long, List<Long>> readInput(String fileLocation) {
         Map<Long, List<Long>> input = new HashMap<>();
