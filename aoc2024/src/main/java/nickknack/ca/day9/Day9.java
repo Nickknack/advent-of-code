@@ -1,6 +1,7 @@
 package nickknack.ca.day9;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -10,17 +11,21 @@ public class Day9 {
 
 	private static final boolean TEST = false;
 
-	private static final char FREE_SPACE = '.';
-
 	public static void main(String[] args) {
 		String input = readInput(TEST ? TEST_INPUT : INPUT);
 
-		System.out.println(parseInput(input));
-//		System.out.println(compact(parseInput(input)));
+		File[] files = parseInput(input);
 
-		BigDecimal checksum = calculateChecksum(compact(parseInput(input)));
+		part1(files);
+	}
 
-		System.out.println(checksum);
+	private static void part1(File[] files) {
+		System.out.println("Part 1 start");
+		compact(files);
+
+		long checksum = calculateChecksum(files);
+
+		System.out.printf("Part 1 result: %s\n", checksum);
 	}
 
 	private static String readInput(String fileLocation) {
@@ -29,38 +34,37 @@ public class Day9 {
 		}
 	}
 
-	private static String parseInput(String input) {
-		StringBuilder result = new StringBuilder();
+	private static File[] parseInput(String input) {
+		List<File> files = new ArrayList<>();
 		long id = 0L;
 		for (int i = 0; i < input.length(); i += 2) {
 			int block = Integer.parseInt(String.valueOf(input.charAt(i)));
 			int freeSpace = i + 1 == input.length() ? 0 : Integer.parseInt(String.valueOf(input.charAt(i + 1)));
 
-			result.append(String.valueOf(id).repeat(block));
-			result.append(String.valueOf(FREE_SPACE).repeat(freeSpace));
+			files.add(new File(id, block, freeSpace));
 			id++;
 		}
 
-		return result.toString();
+		return files.toArray(File[]::new);
 	}
 
-	private static String compact(String parsedInput) {
-		char[] inputArray = parsedInput.toCharArray();
-		int rightmostNonEmptyIndex = parsedInput.length() - 1;
-		for (int i = 0; i < inputArray.length && i < rightmostNonEmptyIndex; i++) {
-			if (inputArray[i] == FREE_SPACE) {
-				rightmostNonEmptyIndex = findRightmostNonEmpty(inputArray, rightmostNonEmptyIndex);
-				inputArray[i] = inputArray[rightmostNonEmptyIndex];
-				inputArray[rightmostNonEmptyIndex] = FREE_SPACE;
+	private static void compact(File[] files) {
+		int rightmostNonEmptyIndex = findRightmostNonEmpty(files, files.length - 1);
+		for (int i = 0; i < files.length && i < rightmostNonEmptyIndex; i++) {
+			File nonFullFile = files[i];
+			while (nonFullFile.hasFreeSpace()) {
+				if (files[rightmostNonEmptyIndex].isEmpty()) {
+					rightmostNonEmptyIndex = findRightmostNonEmpty(files, rightmostNonEmptyIndex);
+				}
+
+				nonFullFile.addValueToSpace(files[rightmostNonEmptyIndex].popValue());
 			}
 		}
-
-		return String.valueOf(inputArray).replaceAll("\\.", "");
 	}
 
-	private static int findRightmostNonEmpty(char[] characters, int startingIndex) {
+	private static int findRightmostNonEmpty(File[] files, int startingIndex) {
 		for (int i = startingIndex; i >= 0; i--) {
-			if (characters[i] != FREE_SPACE) {
+			if (!files[i].isEmpty()) {
 				return i;
 			}
 		}
@@ -68,12 +72,16 @@ public class Day9 {
 		throw new RuntimeException("Only empty space to left of index %s".formatted(startingIndex));
 	}
 
-	private static BigDecimal calculateChecksum(String compactString) {
-		BigDecimal checksum = BigDecimal.ZERO;
-		for (int i = 0; i < compactString.length(); i++) {
-			checksum = checksum.add(BigDecimal.valueOf(i * Long.parseLong(String.valueOf(compactString.charAt(i)))));
+	private static long calculateChecksum(File[] files) {
+		long hashPosition = 0;
+		long hashTotal = 0;
+		for (File file : files) {
+			for (long block : file.getBlocks()) {
+				hashTotal += block * hashPosition;
+				hashPosition++;
+			}
 		}
 
-		return checksum;
+		return hashTotal;
 	}
 }
