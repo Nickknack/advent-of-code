@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class Day1 {
-    //6932
     private static final int INITIAL_POSITION = 50;
     private static final int OUT_OF_BOUNDS = 100;
 
