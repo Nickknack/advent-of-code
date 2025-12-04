@@ -52,4 +52,3 @@ public class Day3 {
         return currentLeft * 10L + currentRight;
 	}
 }
-//17638
