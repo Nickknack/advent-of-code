@@ -70,5 +70,23 @@ public class Day5 {
         return false;
     }
 
+    private static List<Range> mergeOverlappingRanges(List<Range> ranges) {
+        List<Range> condensedRanges = new ArrayList<>();
+        Optional<Range> currentRange = Optional.empty();
+
+        for (Range range : ranges) {
+            if (currentRange.isEmpty()) {
+                currentRange = Optional.of(range);
+            } else if (range.start > currentRange.get().end) {
+                condensedRanges.add(currentRange.get());
+                currentRange = Optional.of(range);
+            } else if (range.end > currentRange.get().end) {
+                currentRange = Optional.of(new Range(currentRange.get().start, range.end));
+            }
+        }
+
+        return condensedRanges;
+    }
+
     record Range(long start, long end) {}
 }
