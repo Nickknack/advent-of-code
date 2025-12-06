@@ -3,6 +3,7 @@ package nickknack.ca.day6;
 import nickknack.ca.common.DayPart;
 import nickknack.ca.common.FileReader;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.CompletableFuture;
@@ -29,10 +30,38 @@ public class Day6 {
     }
 
     private static Stack<String>[] getEquations(List<String> lines) {
-        return new Stack[lines.size()];
+        Stack[] stacks = null;
+
+        for (String line : lines) {
+            String[] values = line.trim().split("\\s+");
+
+            if (stacks == null) {
+                stacks = new Stack[values.length];
+            }
+
+            for (int i = 0; i < values.length; i++) {
+                if (stacks[i] == null) {
+                    stacks[i] = new Stack<String>();
+                }
+                stacks[i].push(values[i]);
+            }
+        }
+
+        return stacks;
+    }
+
+    private static long calculateEquation(Stack<String> equation) {
+        Operation operation = Operation.fromSymbol(equation.pop());
+
+        return equation.stream()
+                .map(Long::valueOf)
+                .reduce((val1, val2) -> Operation.ADD == operation ? val1 + val2 : val1 * val2)
+                .orElse(0L);
     }
 
     private static long getGrandTotal(Stack<String>[] equations) {
-        return 0L;
+        return Arrays.stream(equations)
+                .map(equation -> calculateEquation(equation))
+                .reduce(0L, Long::sum);
     }
 }
