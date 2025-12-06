@@ -20,13 +20,13 @@ public class Day5 {
 
         CompletableFuture.allOf(loadTestData, loadRealData).join();
 
-        CompletableFuture<Void> testPart1 = CompletableFuture.supplyAsync(() -> getFreshCount(testRanges, testIngredients))
-                .thenAccept(result -> System.out.printf("Part 1 Test: %s\n\n", result));
+        CompletableFuture<Void> test = CompletableFuture.supplyAsync(() -> getFreshCount(testRanges, testIngredients))
+                .thenAccept(result -> System.out.printf("Part 1 Test: %s\nPart 2 Test: %s\n\n", result.freshIngredients, result.freshRangeCount));
 
-        CompletableFuture<Void> part1 = CompletableFuture.supplyAsync(() -> getFreshCount(actualRanges, actualIngredients))
-                .thenAccept(result -> System.out.printf("Part 1: %s\n\n", result));
+        CompletableFuture<Void> actual = CompletableFuture.supplyAsync(() -> getFreshCount(actualRanges, actualIngredients))
+                .thenAccept(result -> System.out.printf("Part 1: %s\nPart 2: %s\n\n", result.freshIngredients, result.freshRangeCount));
 
-        CompletableFuture.allOf(testPart1, part1).join();
+        CompletableFuture.allOf(test, actual).join();
     }
 
     private static void loadDataAndSort(List<String> lines, List<Range> ranges, List<Long> ingredients) {
@@ -47,15 +47,23 @@ public class Day5 {
 
         Collections.sort(ingredients);
         ranges.sort(Comparator.comparing(Range::start));
+        List<Range> mergedRanges = mergeOverlappingRanges(ranges);
+        ranges.clear();
+        ranges.addAll(mergedRanges);
     }
 
-    private static long getFreshCount(List<Range> ranges, List<Long> ingredients) {
+    private static Result getFreshCount(List<Range> ranges, List<Long> ingredients) {
         List<Range> modifiedRange = new ArrayList<>(ranges);
 
-        return ingredients.stream()
+        long freshIngredientCount = ingredients.stream()
                 .filter(ingredient -> isFresh(ingredient, ranges))
                 .count();
 
+        long freshRangeCount = ranges.stream()
+                .map(range -> range.end - range.start + 1)
+                .reduce(0L, Long::sum);
+
+        return new Result(freshIngredientCount, freshRangeCount);
     }
 
     private static boolean isFresh(Long ingredient, List<Range> ranges) {
@@ -85,8 +93,14 @@ public class Day5 {
             }
         }
 
+        if (currentRange.isPresent()) {
+            condensedRanges.add(currentRange.get());
+        }
+
         return condensedRanges;
     }
 
     record Range(long start, long end) {}
+
+    record Result(long freshIngredients, long freshRangeCount) {}
 }
