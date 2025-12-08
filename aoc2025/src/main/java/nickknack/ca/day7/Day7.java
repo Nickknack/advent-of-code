@@ -25,7 +25,36 @@ public class Day7 {
         CompletableFuture<Void> actualPart1 = CompletableFuture.supplyAsync(() -> getSplitCount(actualLines))
                 .thenAccept(result -> System.out.printf("Part 1: %s\n\n", result));
 
-        CompletableFuture.allOf(testPart1, actualPart1).join();
+        CompletableFuture<Void> testPart2 = CompletableFuture.supplyAsync(() -> dfs(testLines))
+                .thenAccept(result -> System.out.printf("Part 2 Test: %s\n\n", result));
+
+        CompletableFuture<Void> actualPart2 = CompletableFuture.supplyAsync(() -> dfs(actualLines))
+                .thenAccept(result -> System.out.printf("Part 2: %s\n\n", result));
+
+        CompletableFuture.allOf(testPart1, actualPart1, testPart2, actualPart2).join();
+    }
+
+    private static long dfs(List<String> lines) {
+        int startIndex = lines.get(0).indexOf(START);
+
+        return dfs(lines.subList(1, lines.size()), startIndex);
+    }
+
+    private static long dfs(List<String> lines, int beamIndex) {
+        String line = lines.get(0);
+
+        if (beamIndex < 0 || beamIndex > line.length()) {
+            return 0;
+        }
+        if (lines.size() == 1) {
+            return 1;
+        }
+
+        if (line.charAt(beamIndex) == SPLITTER) {
+            return dfs(lines.subList(1, lines.size()), beamIndex - 1) + dfs(lines.subList(1, lines.size()), beamIndex + 1);
+        } else {
+            return dfs(lines.subList(1, lines.size()), beamIndex);
+        }
     }
 
     private static long getSplitCount(List<String> lines) {
