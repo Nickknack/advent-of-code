@@ -3,7 +3,10 @@ package nickknack.ca.day7;
 import nickknack.ca.common.DayPart;
 import nickknack.ca.common.FileReader;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,36 +28,41 @@ public class Day7 {
         CompletableFuture<Void> actualPart1 = CompletableFuture.supplyAsync(() -> getSplitCount(actualLines))
                 .thenAccept(result -> System.out.printf("Part 1: %s\n\n", result));
 
-        CompletableFuture<Void> testPart2 = CompletableFuture.supplyAsync(() -> dfs(testLines))
+        CompletableFuture<Void> testPart2 = CompletableFuture.supplyAsync(() -> getPaths(testLines))
                 .thenAccept(result -> System.out.printf("Part 2 Test: %s\n\n", result));
 
-        CompletableFuture<Void> actualPart2 = CompletableFuture.supplyAsync(() -> dfs(actualLines))
+        CompletableFuture<Void> actualPart2 = CompletableFuture.supplyAsync(() -> getPaths(actualLines))
                 .thenAccept(result -> System.out.printf("Part 2: %s\n\n", result));
 
         CompletableFuture.allOf(testPart1, actualPart1, testPart2, actualPart2).join();
     }
 
-    private static long dfs(List<String> lines) {
+    private static long getPaths(List<String> lines) {
+        Map<Integer, Long> beamCounts = new HashMap<>();
+
         int startIndex = lines.get(0).indexOf(START);
+        beamCounts.put(startIndex, 1L);
 
-        return dfs(lines.subList(1, lines.size()), startIndex);
-    }
-
-    private static long dfs(List<String> lines, int beamIndex) {
-        String line = lines.get(0);
-
-        if (beamIndex < 0 || beamIndex > line.length()) {
-            return 0;
+        for (String line : lines) {
+            Map<Integer, Long> newMap = new HashMap<>(beamCounts);
+            for (Entry<Integer, Long> beam : beamCounts.entrySet()) {
+                char spot = line.charAt(beam.getKey());
+                if (spot == SPLITTER) {
+                    newMap.remove(beam.getKey());
+                    if (beam.getKey() + 1 < line.length()) {
+                        newMap.put(beam.getKey() + 1, beam.getValue() + newMap.getOrDefault(beam.getKey() + 1, 0L));
+                    }
+                    if (beam.getKey() - 1 >= 0) {
+                        newMap.put(beam.getKey() - 1, beam.getValue() + newMap.getOrDefault(beam.getKey() - 1, 0L));
+                    }
+                }
+            }
+            beamCounts = newMap;
         }
-        if (lines.size() == 1) {
-            return 1;
-        }
 
-        if (line.charAt(beamIndex) == SPLITTER) {
-            return dfs(lines.subList(1, lines.size()), beamIndex - 1) + dfs(lines.subList(1, lines.size()), beamIndex + 1);
-        } else {
-            return dfs(lines.subList(1, lines.size()), beamIndex);
-        }
+        return beamCounts.values()
+                .stream()
+                .reduce(0L, Long::sum);
     }
 
     private static long getSplitCount(List<String> lines) {
